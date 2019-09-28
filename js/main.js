@@ -3,13 +3,14 @@
 var map = document.querySelector('.map');
 
 var blockWidth = 1000;
-var pin = {'height': 70, 'width': 50};
+var pinSize = {'height': 70, 'width': 50};
 var apartamentsArray = ['palace', 'flat', 'house', 'bungalo'];
 var checkinArray = ['12:00', '13:00', '14:00'];
 var checkoutArray = ['12:00', '13:00', '14:00'];
 var featuresArray = ['wifi', 'dishwasher', 'parking', 'washer', 'elevator', 'conditioner'];
 var photosArray = ['http://o0.github.io/assets/images/tokyo/hotel1.jpg', 'http://o0.github.io/assets/images/tokyo/hotel2.jpg', 'http://o0.github.io/assets/images/tokyo/hotel3.jpg'];
 var description = 'bla-bla-bla';
+var arrayLength = 8;
 
 var getRandomInt = function (min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -58,18 +59,16 @@ var getGuestsQuantity = function () {
   return guests;
 };
 
-var getLocation = function (pinSize) {
-  var position = {};
-  position.x = getRandomInt(1, blockWidth) - pinSize.width;
-  position.y = getRandomInt(130, 630) - pinSize.height;
-  return position;
+var getLocation = function () {
+  var location = {};
+  location.x = getRandomInt(1, blockWidth) - pinSize.width;
+  location.y = getRandomInt(130, 630) - pinSize.height;
+  return location;
 };
-
 
 var renderMock = function () {
   var mock = [];
-  for (var i = 0; i < 8; i++) {
-    var prerenderLocation = getLocation(pin);
+  for (var i = 0; i < arrayLength; i++) {
     var mockElement = {
       'author': {
         'avatar': renderAvatarUrl(i)
@@ -77,7 +76,7 @@ var renderMock = function () {
 
       'offer': {
         'title': renderTitle(i),
-        'address': prerenderLocation.x + ', ' + prerenderLocation.y,
+        'address': getLocation().x + ', ' + getLocation().y,
         'price': getPrice(),
         'type': getRandomArrayElement(apartamentsArray),
         'rooms': getRoomsQuantity(),
@@ -89,7 +88,7 @@ var renderMock = function () {
         'photos': getRandomArrayElements(photosArray)
       },
 
-      'location': prerenderLocation
+      'location': getLocation()
     };
     mock.push(mockElement);
   }
@@ -98,26 +97,30 @@ var renderMock = function () {
 
 var mockArray = renderMock();
 
-var renderPinsList = function (dataArray) {
+var renderPin = function (i) {
   var pinTemplate = document.querySelector('#pin').content
       .querySelector('.map__pin');
+  var clonedElement = pinTemplate.cloneNode(true);
+  clonedElement.style = 'left: ' + mockArray[i].location.x + 'px; top: ' + mockArray[i].location.y + 'px;';
+  var innerImg = clonedElement.querySelector('img');
+  innerImg.alt = mockArray[i].offer.title;
+  innerImg.src = mockArray[i].author.avatar;
+  return clonedElement;
+};
+
+var renderPinsList = function () {
   var fragment = document.createDocumentFragment();
-  for (var i = 0; i <= dataArray.length - 1; i++) {
-    var clonedElement = pinTemplate.cloneNode(true);
-    fragment.appendChild(clonedElement);
-    clonedElement.style = 'left: ' + dataArray[i].location.x + 'px; top: ' + dataArray[i].location.y + 'px;';
-    var innerImg = clonedElement.querySelector('img');
-    innerImg.alt = mockArray[i].offer.title;
-    innerImg.src = mockArray[i].author.avatar;
+  for (var i = 0; i <= mockArray.length - 1; i++) {
+    fragment.appendChild(renderPin(i));
   }
   return (fragment);
 };
 
-var setPinsList = function (dataArray) {
+var setPinsList = function () {
   var mapPins = document.querySelector('.map__pins');
-  mapPins.appendChild(renderPinsList(dataArray));
+  mapPins.appendChild(renderPinsList(mockArray));
 };
 
-setPinsList(mockArray);
+setPinsList();
 
 map.classList.remove('map--faded');
