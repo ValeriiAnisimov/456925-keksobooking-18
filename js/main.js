@@ -2,15 +2,23 @@
 
 var map = document.querySelector('.map');
 
-var blockWidth = 1000;
-var pinSize = {'height': 70, 'width': 50};
-var apartamentsArray = ['palace', 'flat', 'house', 'bungalo'];
-var checkinArray = ['12:00', '13:00', '14:00'];
-var checkoutArray = ['12:00', '13:00', '14:00'];
-var featuresArray = ['wifi', 'dishwasher', 'parking', 'washer', 'elevator', 'conditioner'];
-var photosArray = ['http://o0.github.io/assets/images/tokyo/hotel1.jpg', 'http://o0.github.io/assets/images/tokyo/hotel2.jpg', 'http://o0.github.io/assets/images/tokyo/hotel3.jpg'];
-var description = 'bla-bla-bla';
-var arrayLength = 8;
+var MIN_ROOMS = 0;
+var MAX_ROOMS = 3;
+var MIN_GUESTS = 0;
+var MAX_GUESTS = 10;
+var PRICE_LIMITER = 10000;
+var LOCATION_X_MIN = 1;
+var LOCATION_Y_MIN = 130;
+var LOCATION_Y_MAX = 630;
+var BLOCK_WIDTH = 1000;
+var PIN_SIZE = {'height': 70, 'width': 50};
+var APARTAMENTS_ARRAY = ['palace', 'flat', 'house', 'bungalo'];
+var CHECKIN_ARRAY = ['12:00', '13:00', '14:00'];
+var CHECKOUT_ARRAY = ['12:00', '13:00', '14:00'];
+var FEATURES_ARRAY = ['wifi', 'dishwasher', 'parking', 'washer', 'elevator', 'conditioner'];
+var PHOTOS_ARRAY = ['http://o0.github.io/assets/images/tokyo/hotel1.jpg', 'http://o0.github.io/assets/images/tokyo/hotel2.jpg', 'http://o0.github.io/assets/images/tokyo/hotel3.jpg'];
+var DESCRIPTION = 'bla-bla-bla';
+var ARRAY_LENGTH = 8;
 
 var getRandomInt = function (min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -27,7 +35,7 @@ var renderTitle = function (i) {
 };
 
 var getPrice = function () {
-  var price = Math.floor(Math.random().toFixed(2) * 10000);
+  var price = Math.floor(Math.random().toFixed(2) * PRICE_LIMITER);
   return price;
 };
 
@@ -43,32 +51,31 @@ var getRandomArrayElements = function (array) {
   return randomElements;
 };
 
-
 var getRandomArrayElement = function (array) {
   var randomElement = array[getRandomInt(0, array.length - 1)];
   return randomElement;
 };
 
 var getRoomsQuantity = function () {
-  var rooms = getRandomInt(0, 3);
+  var rooms = getRandomInt(MIN_ROOMS, MAX_ROOMS);
   return rooms;
 };
 
 var getGuestsQuantity = function () {
-  var guests = getRandomInt(0, 10);
+  var guests = getRandomInt(MIN_GUESTS, MAX_GUESTS);
   return guests;
 };
 
 var getLocation = function () {
   var location = {};
-  location.x = getRandomInt(1, blockWidth) - pinSize.width;
-  location.y = getRandomInt(130, 630) - pinSize.height;
+  location.x = getRandomInt(LOCATION_X_MIN, BLOCK_WIDTH);
+  location.y = getRandomInt(LOCATION_Y_MIN, LOCATION_Y_MAX);
   return location;
 };
 
 var renderMock = function () {
   var mock = [];
-  for (var i = 0; i < arrayLength; i++) {
+  for (var i = 0; i < ARRAY_LENGTH; i++) {
     var mockElement = {
       'author': {
         'avatar': renderAvatarUrl(i)
@@ -78,14 +85,14 @@ var renderMock = function () {
         'title': renderTitle(i),
         'address': getLocation().x + ', ' + getLocation().y,
         'price': getPrice(),
-        'type': getRandomArrayElement(apartamentsArray),
+        'type': getRandomArrayElement(APARTAMENTS_ARRAY),
         'rooms': getRoomsQuantity(),
         'guests': getGuestsQuantity(),
-        'checkin': getRandomArrayElement(checkinArray),
-        'checkout': getRandomArrayElement(checkoutArray),
-        'features': getRandomArrayElements(featuresArray),
-        'description': description,
-        'photos': getRandomArrayElements(photosArray)
+        'checkin': getRandomArrayElement(CHECKIN_ARRAY),
+        'checkout': getRandomArrayElement(CHECKOUT_ARRAY),
+        'features': getRandomArrayElements(FEATURES_ARRAY),
+        'description': DESCRIPTION,
+        'photos': getRandomArrayElements(PHOTOS_ARRAY)
       },
 
       'location': getLocation()
@@ -97,14 +104,15 @@ var renderMock = function () {
 
 var mockArray = renderMock();
 
-var renderPin = function (i) {
+var renderPin = function (pin) {
   var pinTemplate = document.querySelector('#pin').content
       .querySelector('.map__pin');
   var clonedElement = pinTemplate.cloneNode(true);
-  clonedElement.style = 'left: ' + mockArray[i].location.x + 'px; top: ' + mockArray[i].location.y + 'px;';
+  clonedElement.style = 'left: ' + (mockArray[pin].location.x - PIN_SIZE.width / 2) + 'px; top: ' + (mockArray[pin].location.y - PIN_SIZE.height) + 'px;';
   var innerImg = clonedElement.querySelector('img');
-  innerImg.alt = mockArray[i].offer.title;
-  innerImg.src = mockArray[i].author.avatar;
+  innerImg.alt = mockArray[pin].offer.title;
+  innerImg.src = mockArray[pin].author.avatar;
+  clonedElement.tabindex = 0;
   return clonedElement;
 };
 
