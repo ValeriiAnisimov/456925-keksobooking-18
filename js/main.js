@@ -2,9 +2,9 @@
 
 var map = document.querySelector('.map');
 
-var MIN_ROOMS = 0;
+var MIN_ROOMS = 1;
 var MAX_ROOMS = 3;
-var MIN_GUESTS = 0;
+var MIN_GUESTS = 1;
 var MAX_GUESTS = 10;
 var PRICE_LIMITER = 10000;
 var LOCATION_X_MIN = 1;
@@ -19,6 +19,8 @@ var FEATURES_ARRAY = ['wifi', 'dishwasher', 'parking', 'washer', 'elevator', 'co
 var PHOTOS_ARRAY = ['http://o0.github.io/assets/images/tokyo/hotel1.jpg', 'http://o0.github.io/assets/images/tokyo/hotel2.jpg', 'http://o0.github.io/assets/images/tokyo/hotel3.jpg'];
 var DESCRIPTION = 'bla-bla-bla';
 var ARRAY_LENGTH = 8;
+var GUEST_END = '';
+var ROOM_END = '';
 
 var getRandomInt = function (min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -132,3 +134,58 @@ var setPinsList = function () {
 setPinsList();
 
 map.classList.remove('map--faded');
+
+
+var renderAdCard = function () {
+  var cardTemplate = document.querySelector('#card').content.querySelector('.map__card');
+  var clonedCard = cardTemplate.cloneNode(true);
+  clonedCard.querySelector('.popup__title').textContent = mockArray[1].offer.title;
+  clonedCard.querySelector('.popup__text--address').textContent = mockArray[1].offer.address;
+  clonedCard.querySelector('.popup__text--price').textContent = mockArray[1].offer.price + '₽/ночь';
+  clonedCard.querySelector('.popup__type').textContent = mockArray[1].offer.type;
+
+  if (mockArray[1].offer.guests === 1) {
+    GUEST_END = ' гостя';
+  } else {
+    GUEST_END = ' гостей';
+  }
+
+  if (mockArray[1].offer.rooms === 1) {
+    ROOM_END = ' комната для ';
+  } else if (mockArray[1].offer.rooms <= 4) {
+    ROOM_END = ' комнаты для ';
+  } else {
+    ROOM_END = ' комнат для ';
+  }
+
+  clonedCard.querySelector('.popup__text--capacity').textContent = mockArray[1].offer.rooms + ROOM_END + mockArray[1].offer.guests + GUEST_END;
+
+
+  clonedCard.querySelector('.popup__text--time').textContent = 'Заезд после' + mockArray[1].offer.checkin + ', выезд до ' + mockArray[1].offer.checkout;
+
+  var featuresList = clonedCard.querySelector('.popup__features');
+
+  for (var i = 0; i < FEATURES_ARRAY.length; i++) {
+    if (mockArray[1].offer.features.indexOf(FEATURES_ARRAY[i]) === -1) {
+      featuresList.childNodes[i].style = 'display: none;';
+    }
+  }
+
+  clonedCard.querySelector('.popup__description').textContent = mockArray[1].offer.description;
+
+  var photo = clonedCard.querySelector('.popup__photo');
+  var imgFragment = document.createDocumentFragment();
+  for (var j = 0; j < mockArray[1].offer.photos.length; j++) {
+    var clonedPhoto = photo.cloneNode(true);
+    clonedPhoto.src = mockArray[1].offer.photos[j];
+    imgFragment.appendChild(clonedPhoto);
+  }
+  clonedCard.querySelector('.popup__photos').replaceChild(imgFragment, photo);
+
+  return clonedCard;
+};
+
+var placeForDescriptionInsert = document.querySelector('.map__filters-container');
+var fragment = document.createDocumentFragment();
+fragment.appendChild(renderAdCard());
+placeForDescriptionInsert.before(fragment);
