@@ -19,8 +19,8 @@ var FEATURES_ARRAY = ['wifi', 'dishwasher', 'parking', 'washer', 'elevator', 'co
 var PHOTOS_ARRAY = ['http://o0.github.io/assets/images/tokyo/hotel1.jpg', 'http://o0.github.io/assets/images/tokyo/hotel2.jpg', 'http://o0.github.io/assets/images/tokyo/hotel3.jpg'];
 var DESCRIPTION = 'bla-bla-bla';
 var ARRAY_LENGTH = 8;
-var GUEST_END = '';
-var ROOM_END = '';
+var GUESTS_END_ARRAY = ['гость', 'гостя', 'гостей'];
+var ROOMS_END_ARRAY = ['комната', 'комнаты', 'комнат'];
 
 var getRandomInt = function (min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -144,21 +144,19 @@ var renderAdCard = function () {
   clonedCard.querySelector('.popup__text--price').textContent = mockArray[1].offer.price + '₽/ночь';
   clonedCard.querySelector('.popup__type').textContent = mockArray[1].offer.type;
 
-  if (mockArray[1].offer.guests === 1) {
-    GUEST_END = ' гостя';
-  } else {
-    GUEST_END = ' гостей';
-  }
+  var getEnd = function (number, cases) {
+    var numberToString = String(number);
+    var lastNumeral = numberToString[numberToString.length - 1];
+    if (Number(lastNumeral) === 1 && Number(numberToString[numberToString.length - 2]) !== 1) {
+      return cases[0];
+    } else if (Number(lastNumeral) <= 4 && Number(numberToString[numberToString.length - 2]) !== 1) {
+      return cases[1];
+    } else {
+      return cases[2];
+    }
+  };
 
-  if (mockArray[1].offer.rooms === 1) {
-    ROOM_END = ' комната для ';
-  } else if (mockArray[1].offer.rooms <= 4) {
-    ROOM_END = ' комнаты для ';
-  } else {
-    ROOM_END = ' комнат для ';
-  }
-
-  clonedCard.querySelector('.popup__text--capacity').textContent = mockArray[1].offer.rooms + ROOM_END + mockArray[1].offer.guests + GUEST_END;
+  clonedCard.querySelector('.popup__text--capacity').textContent = mockArray[1].offer.rooms + ' ' + getEnd(mockArray[1].offer.rooms, ROOMS_END_ARRAY) + ' для ' + mockArray[1].offer.guests + ' ' + getEnd(mockArray[1].offer.guests, GUESTS_END_ARRAY);
 
 
   clonedCard.querySelector('.popup__text--time').textContent = 'Заезд после' + mockArray[1].offer.checkin + ', выезд до ' + mockArray[1].offer.checkout;
@@ -181,6 +179,7 @@ var renderAdCard = function () {
     imgFragment.appendChild(clonedPhoto);
   }
   clonedCard.querySelector('.popup__photos').replaceChild(imgFragment, photo);
+  clonedCard.querySelector('.popup__avatar').src = mockArray[1].author.avatar;
 
   return clonedCard;
 };
