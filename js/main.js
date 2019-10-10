@@ -269,22 +269,21 @@ var activationeMapAndForm = function () {
   map.classList.remove('map--faded');
   mainForm.classList.remove('ad-form--disabled');
   inputAddress.value = activatedInputAddress;
-  mainPin.removeEventListener('mousedown', function () {
-    activationeMapAndForm();
-  });
+
+  mainPin.removeEventListener('mousedown', activationeMapAndForm);
+  mainPin.removeEventListener('keydown', mainPinEnterHandler);
 };
 
 inputAddress.value = initialInputAddres;
 
 mainPin.style.tabindex = '0';
-mainPin.addEventListener('mousedown', function () {
-  activationeMapAndForm();
-});
-mainPin.addEventListener('keydown', function (evt) {
+var mainPinEnterHandler = function (evt) {
   if (evt.keyCode === ENTER_KEYCODE) {
     activationeMapAndForm();
   }
-});
+};
+mainPin.addEventListener('mousedown', activationeMapAndForm);
+mainPin.addEventListener('keydown', mainPinEnterHandler);
 
 var roomsAmountSelect = mainForm.querySelector('#room_number');
 var capacitySelect = mainForm.querySelector('#capacity');
