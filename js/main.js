@@ -21,6 +21,7 @@ var ARRAY_LENGTH = 8;
 var GUESTS_END_ARRAY = ['гостя', 'гостей', 'гостей'];
 var ROOMS_END_ARRAY = ['комната', 'комнаты', 'комнат'];
 var ENTER_KEYCODE = 13;
+var ESC_KEYCODE = 27;
 var ROOMS_CAPACITY_VALUES = {
   '1': ['1'],
   '2': ['1', '2'],
@@ -133,6 +134,17 @@ var renderMock = function () {
 
 var mockArray = renderMock();
 
+var pinDeactivating = function () {
+  var activePin = document.querySelector('.map__pin--active');
+  if (activePin) {
+    activePin.classList.remove('map__pin--active');
+  }
+};
+var setActivePin = function (evt) {
+  pinDeactivating();
+  evt.currentTarget.classList.add('map__pin--active');
+};
+
 var renderPin = function (pin) {
   var pinTemplate = document.querySelector('#pin').content
       .querySelector('.map__pin');
@@ -144,11 +156,12 @@ var renderPin = function (pin) {
   innerImg.src = pin.author.avatar;
   clonedElement.tabindex = 0;
 
-  clonedElement.addEventListener('click', function () {
+  clonedElement.addEventListener('click', function (evt) {
     setAddCard(pin);
+    setActivePin(evt);
   });
 
-  clonedElement.addEventListener('click', function (evt) {
+  clonedElement.addEventListener('keydown', function (evt) {
     if (evt.keyCode === ENTER_KEYCODE) {
       setAddCard(pin);
     }
@@ -231,6 +244,7 @@ var renderAddCard = function (cardData) {
     clonedCard.parentElement.removeChild(clonedCard);
   });
 
+
   return clonedCard;
 };
 
@@ -273,6 +287,15 @@ var activationeMapAndForm = function () {
   mainPin.removeEventListener('mousedown', activationeMapAndForm);
   mainPin.removeEventListener('keydown', mainPinEnterHandler);
 };
+document.addEventListener('keydown', function (evt) {
+  if (evt.keyCode === ESC_KEYCODE) {
+    var popup = map.querySelector('.popup');
+    if (popup !== null) {
+      popup.remove();
+    }
+    pinDeactivating();
+  }
+});
 
 inputAddress.value = initialInputAddres;
 
